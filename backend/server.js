@@ -1,10 +1,19 @@
-import e from 'express'
+import express, { json } from 'express'
 import dotenv from 'dotenv'
 import mongoose from 'mongoose';
+import userRoutes from './routes/routes.user.js'
 
 dotenv.config();
-const app = e();
+const app = express();
+app.use(express.json());
+
 const PORT = process.env.PORT || 3001;
+
+app.get('/', (req, res) => {
+  res.send('<h1 style="color: #FF5733;">Hello World! Server is running!</h1>')
+});
+
+app.use('/api/user', userRoutes)
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
@@ -17,8 +26,4 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => {
     console.error('Failed to connect to MongoDB', err);
   });
-
-app.get("/", (req, res) => {
-    res.send('<h1 style="color: #FF5733;">Hello World! Server is running!</h1>')
-});
 

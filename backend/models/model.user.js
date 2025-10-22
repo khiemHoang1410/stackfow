@@ -1,10 +1,10 @@
- import mongoose from 'mongoose';
+import mongoose from 'mongoose';
+import bcryptjs from 'bcryptjs'
 
 // 1. Tạo "Bản Thiết Kế" (Schema) cho User
 const userSchema = new mongoose.Schema(
   {
     // Tên của user, là một chuỗi (String), bắt buộc phải có (required)
-    // trim: true sẽ tự động loại bỏ khoảng trắng thừa ở đầu và cuối
     username: {
       type: String,
       required: true,
@@ -27,10 +27,22 @@ const userSchema = new mongoose.Schema(
   },
   {
     // Tự động thêm 2 trường createdAt và updatedAt
-    timestamps: true 
+    timestamps: true
   }
 );
 
+
+//hasshing
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    return next();
+  }
+
+  const salt = await bcryptjs.genSalt(10);
+  this.password = await bcryptjs.hash(this.password, salt)
+  return next;
+
+})
 // 2. "Biên Dịch" bản thiết kế thành một Model
 // Mongoose sẽ tự động tạo một collection tên là "users" (dạng số nhiều của 'User')
 const User = mongoose.model('User', userSchema);

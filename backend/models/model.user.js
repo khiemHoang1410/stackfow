@@ -40,11 +40,16 @@ userSchema.pre('save', async function (next) {
 
   const salt = await bcryptjs.genSalt(10);
   this.password = await bcryptjs.hash(this.password, salt)
-  return next;
+  return next();
 
 })
-// 2. "Biên Dịch" bản thiết kế thành một Model
-// Mongoose sẽ tự động tạo một collection tên là "users" (dạng số nhiều của 'User')
+
+
+// Thêm một phương thức tùy chỉnh tên là matchPassword vào schema
+// Phương thức này sẽ có sẵn trên mọi document User
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcryptjs.compare(enteredPassword, this.password)
+}
 const User = mongoose.model('User', userSchema);
 
 // 3. Export cái Model này ra để các file khác có thể dùng

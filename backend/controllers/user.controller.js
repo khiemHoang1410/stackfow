@@ -1,4 +1,5 @@
 import User from '../models/model.user.js'
+import generateToken from '../utils/generateToken.js';
 const registerUser = async (req, res) => {
     try {
         //lấy dữ liệu từ req
@@ -22,6 +23,7 @@ const registerUser = async (req, res) => {
             email: saveUser.email
         })
 
+        generateToken(res, saveUser._id)
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
@@ -43,11 +45,15 @@ const loginUser = async (req, res) => {
         const isPasswordMatch = await user.matchPassword(password);
 
         if (isPasswordMatch) {
+            generateToken(res, user._id);
+            
             res.status(200).json({
                 _id: user._id,
                 username: user.username,
                 email: user.email,
             });
+
+
         } else {
             res.status(401).json({ message: 'Invalid email or password' });
         }
